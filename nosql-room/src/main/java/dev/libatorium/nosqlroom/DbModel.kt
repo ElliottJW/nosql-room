@@ -8,7 +8,7 @@ import java.io.Serializable
 import java.util.*
 
 /**
- * DbMoel represents an object that can be saved to the no-sql database.
+ * DbModel represents an object that can be saved to the no-sql database.
  */
 interface DbModel : Serializable {
 
