@@ -15,7 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.libatorium.lib.nosqlroom.R
+import dev.libatorium.nosqlroom.R
 import dev.libatorium.nosqlroom.domain.model.User
 import dev.libatorium.nosqlroom.ui.theme.NoSqlRoomSampleTheme
 
