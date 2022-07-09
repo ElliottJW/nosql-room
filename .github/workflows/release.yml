@@ -1,7 +1,7 @@
 name: Release Library
-  on:
-    push:
-      tags: 'v*
+on:
+  push:
+    tags: 'v*
 
   jobs:
     publish:
