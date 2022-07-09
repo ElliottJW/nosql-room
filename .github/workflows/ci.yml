@@ -58,7 +58,7 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-          ${{ runner.os }}-gradle-
+            ${{ runner.os }}-gradle-
 
       - name: Run espresso tests
         uses: reactivecircus/android-emulator-runner@v2
