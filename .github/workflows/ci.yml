@@ -11,9 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create lint folder
-        run: |
-          mkdir -p lint
-          ~/lint/**/*
+        run: mkdir -p lint
 
       - name: Checkout the code
         uses: actions/checkout@v2
@@ -22,16 +20,14 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: lint.html
-          path: build/reports/lint-results-debug.html
+          path: ~/lint/**/*
 
   unit-test:
     needs: [lint]
     runs-on: ubuntu-latest
     steps:
       - name: Create unit-test folder
-        run: |
-          mkdir -p unit-test
-          ~/unit-test/**/*
+        run: mkdir -p unit-test
 
       - name: Checkout the code
         uses: actions/checkout@v2
@@ -52,16 +48,14 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: unit_test_report
-          path: build/reports/tests/testDebugUnitTest/
+          path: ~/unit-test/**/*
 
   instrumentation-test:
     needs: [unit-test]
     runs-on: macos-latest
     steps:
       - name: Create instrumentation-test folder
-        run: |
-          mkdir -p instrumentation-test
-          ~/instrumentation-test/**/*
+        run: mkdir -p instrumentation-test
 
       - name: Checkout the code
         uses: actions/checkout@v2
@@ -86,4 +80,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: instrumentation_test_report
-          path: nosql-room/build/reports/androidTests/connected/
+          path: ~/instrumentation-test/**/*
