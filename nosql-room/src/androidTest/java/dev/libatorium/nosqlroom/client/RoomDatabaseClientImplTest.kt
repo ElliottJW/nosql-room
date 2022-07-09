@@ -4,6 +4,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import dev.libatorium.nosqlroom.data.MockCar
 import dev.libatorium.nosqlroom.data.MockUser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -75,7 +79,7 @@ class RoomDatabaseClientImplTest {
         underTest.save(userId, expected)
 
         // When
-        val actual = underTest.get(userId, itemId = expected.id, MockUser::class)
+        val actual = underTest.get(userId, itemId = expected.id, MockUser::class).first()
 
         // Then
         assertEquals(expected, actual)
@@ -93,7 +97,7 @@ class RoomDatabaseClientImplTest {
         underTest.save(userId, item)
 
         // When
-        val actual = underTest.get(userId, itemId = "bad_id", MockUser::class)
+        val actual = underTest.get(userId, itemId = "bad_id", MockUser::class).firstOrNull()
 
         // Then
         assertNull(actual)
@@ -142,7 +146,7 @@ class RoomDatabaseClientImplTest {
         val items = arrayOf(*cars, *users)
         underTest.save(userId, items = items)
 
-        val actual = underTest.getAll(userId, MockCar::class)
+        val actual = underTest.getAll(userId, MockCar::class).first()
         val expected = cars.toList()
         assertEquals(expected, actual)
     }
@@ -191,7 +195,7 @@ class RoomDatabaseClientImplTest {
         underTest.save(userId, items = items)
 
         val expected = users[0]
-        val actual = underTest.get(userId, itemId = expected.id, MockUser::class)
+        val actual = underTest.get(userId, itemId = expected.id, MockUser::class).first()
         assertEquals(expected, actual)
     }
 
@@ -230,7 +234,7 @@ class RoomDatabaseClientImplTest {
     @Test
     fun returnEmptyList_ifNoItemsFound() = runTest {
         val expected = emptyList<MockCar>()
-        val actual = underTest.getAll(userId, MockCar::class)
+        val actual = underTest.getAll(userId, MockCar::class).first()
         assertEquals(expected, actual)
     }
 

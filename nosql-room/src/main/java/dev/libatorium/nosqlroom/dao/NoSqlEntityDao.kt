@@ -1,13 +1,12 @@
 package dev.libatorium.nosqlroom.dao
 
 import androidx.room.*
-import dev.libatorium.nosqlroom.DbModel
+import dev.libatorium.lib.nosqlroom.BuildConfig
 import dev.libatorium.nosqlroom.db.RoomDatabaseClient
 import dev.libatorium.nosqlroom.entity.NoSqlEntity
 import dev.libatorium.nosqlroom.entity.NoSqlEntityAndQueryFields
-import dev.libatorium.nosqlroom.entity.NoSqlQueryField
 import kotlinx.coroutines.flow.Flow
-import kotlin.reflect.KClass
+import timber.log.Timber
 
 @Dao
 internal abstract class NoSqlEntityDao(
@@ -27,18 +26,22 @@ internal abstract class NoSqlEntityDao(
 
     @Transaction
     @Delete
-    suspend fun deleteEntities(userId: String, vararg noSqlEntities: NoSqlEntity) {
+    suspend fun deleteEntities(userId: String, vararg noSqlEntities: NoSqlEntity) : Int {
         // Delete the entities themselves.
         val ids = noSqlEntities.map { e -> e.id }.toTypedArray()
-        deleteEntities(userId = userId, ids = ids)
+        val deletedEntityCount = deleteEntities(userId = userId, ids = ids).also {
+            if (BuildConfig.DEBUG) Timber.d("Deleted $it entities.")
+        }
 
         // Also delete the query fields.
         val queryFields = noSqlEntities.mapNotNull { it.queryableFields }.flatten().toTypedArray()
         noSqlQueryFieldDao.deleteQueryFields(*queryFields)
+
+        return deletedEntityCount
     }
 
     @Query("DELETE FROM nosql_entities WHERE user_id = :userId AND _id IN (:ids)")
-    abstract suspend fun deleteEntities(userId: String, vararg ids: String)
+    abstract suspend fun deleteEntities(userId: String, vararg ids: String) : Int
 
     @Transaction /* POJO is a NoSqlEntity + NoSqlQueryField */
     @Query("SELECT * FROM nosql_entities WHERE user_id = :userId AND type = :typeOf AND _id = :id")

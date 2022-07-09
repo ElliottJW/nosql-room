@@ -55,10 +55,11 @@ internal class RoomDatabaseClientImpl(
         val type = typeOf.qualifiedName ?: throw IllegalArgumentException("Invalid type!")
         return database.noSqlEntityDao().getAllEntitiesOfType(userId = userId, typeOf = type)
             .flowOn(defaultDispatcher)
-            .map { list -> list
-                ?.map { eAF -> eAF.toNoSqlEntity() }
-                ?.map { e -> _gson.fromJson(e.data, typeOf.java) }
-                ?: emptyList()
+            .map { list ->
+                list
+                    ?.map { eAF -> eAF.toNoSqlEntity() }
+                    ?.map { e -> _gson.fromJson(e.data, typeOf.java) }
+                    ?: emptyList()
             }
     }
 
@@ -66,8 +67,11 @@ internal class RoomDatabaseClientImpl(
         val type = typeOf.qualifiedName ?: throw IllegalArgumentException("Invalid type!")
         return database.noSqlEntityDao().getEntity(userId = userId, typeOf = type, id = itemId)
             .flowOn(defaultDispatcher)
-            .mapNotNull { it?.toNoSqlEntity() }
-            .map { e -> _gson.fromJson(e.data, typeOf.java) }
+            .map { it?.toNoSqlEntity() }
+            .map {
+                // Need to return null if no entity was found.
+                it?.let { _gson.fromJson(it.data, typeOf.java) }
+            }
     }
 
     override suspend fun save(userId: String, vararg items: DbModel) =

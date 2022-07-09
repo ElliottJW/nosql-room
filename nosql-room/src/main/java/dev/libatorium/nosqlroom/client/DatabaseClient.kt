@@ -13,7 +13,7 @@ interface DatabaseClient {
 
     suspend fun save(userId: String, vararg items: DbModel)
 
-    suspend fun delete(userId: String, vararg itemIds: String)
+    suspend fun delete(userId: String, vararg itemIds: String) : Int
 
-    suspend fun <T : DbModel> delete(userId: String, vararg items: T)
+    suspend fun <T : DbModel> delete(userId: String, vararg items: T) : Int
 }
