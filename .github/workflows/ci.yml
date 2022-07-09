@@ -10,6 +10,11 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - name: Create lint folder
+        run: |
+          mkdir -p lint
+          ~/lint/**/*
+
       - name: Checkout the code
         uses: actions/checkout@v2
 
@@ -23,6 +28,11 @@ jobs:
     needs: [lint]
     runs-on: ubuntu-latest
     steps:
+      - name: Create unit-test folder
+        run: |
+          mkdir -p unit-test
+          ~/unit-test/**/*
+
       - name: Checkout the code
         uses: actions/checkout@v2
 
@@ -48,6 +58,11 @@ jobs:
     needs: [unit-test]
     runs-on: macos-latest
     steps:
+      - name: Create instrumentation-test folder
+        run: |
+          mkdir -p instrumentation-test
+          ~/instrumentation-test/**/*
+
       - name: Checkout the code
         uses: actions/checkout@v2
 
@@ -63,7 +78,8 @@ jobs:
       - name: Run espresso tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 31
+          api-level: 29
+          arch: x86_64
           script: ./gradlew connectedCheck
 
       - name: Upload test report
