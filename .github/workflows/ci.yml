@@ -13,21 +13,14 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v2
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-
-      - name: Create lint folder
-        run: mkdir -p path/to/artifact
-
-      - run: echo hello > path/to/artifact/world.txt
+      - name: Run tests
+        run: ./gradlew lint
 
       - name: Upload html test report
         uses: actions/upload-artifact@v2
         with:
           name: lint.html
-          path: path/to/artifact/*
+          path: nosql-room/build/reports/lint-results-debug.html
 
   unit-test:
     needs: [lint]
@@ -36,31 +29,14 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v2
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
       - name: Run tests
         run: ./gradlew test
-
-      - name: Create unit-test folder
-        run: mkdir -p path/to/artifact
 
       - name: Upload test report
         uses: actions/upload-artifact@v2
         with:
           name: unit_test_report
-          path: path/to/artifact/*
+          path: nosql-room/build/reports/tests/testDebugUnitTest/**/*
 
   instrumentation-test:
     needs: [unit-test]
@@ -74,27 +50,14 @@ jobs:
         with:
           java-version: 11
 
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
       - name: Run espresso tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          arch: x86_64
           script: ./gradlew connectedCheck
 
-      - name: Create unit-test folder
-        run: mkdir -p path/to/artifact
-
-      - name: Upload test report
+      - name: Upload nosql-room instrumentation test report
         uses: actions/upload-artifact@v2
         with:
           name: instrumentation_test_report
-          path: path/to/artifact/*
+          path: nosql-room/build/reports/androidTests/connected/**/*

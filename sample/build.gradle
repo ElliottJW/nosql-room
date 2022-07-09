@@ -9,7 +9,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "dev.libatorium.lib.nosqlroom.sample"
+        applicationId "dev.libatorium.nosqlroom.sample"
         minSdk 23
         targetSdk 32
         versionCode 1
