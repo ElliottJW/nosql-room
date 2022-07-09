@@ -17,7 +17,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: lint.html
-          path: nosql-room/build/reports/lint-results-debug.html
+          path: build/reports/lint-results-debug.html
 
   unit-test:
     needs: [lint]
@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: unit_test_report
-          path: nosql-room/build/reports/tests/testDebugUnitTest/
+          path: build/reports/tests/testDebugUnitTest/
 
   instrumentation-test:
     needs: [unit-test]
