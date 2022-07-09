@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">nosql-room</string>
+    <string name="no_sql_room_sample_title">NoSql App Sample</string>
+    <string name="add_item_cd">Add item</string>
+    <string name="this_is_user_id">This is user %s</string>
+    <string name="user_id"><b>User ID</b>: %s</string>
+    <string name="delete">Delete</string>
 </resources>
