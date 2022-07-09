@@ -7,8 +7,7 @@ import dev.libatorium.nosqlroom.domain.provider.UserIdProvider
 import dev.libatorium.nosqlroom.domain.repository.UserRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 
 class UserRepositoryImpl(
     private val databaseClient: DatabaseClient,
@@ -19,15 +18,19 @@ class UserRepositoryImpl(
     private val userId: String
         get() = userIdProvider.userId
 
-    override fun getAllUsers(): Flow<List<User>> = flow {
-        Log.i(UserRepositoryImpl::class.simpleName, "Emitting all users from repository.")
-        emit(databaseClient.get(userId = userId, User::class))
-    }.flowOn(defaultDispatcher)
+    override fun getAllUsers(): Flow<List<User>> = databaseClient.getAll(userId = userId, User::class).onEach {
+        Log.d(this::class.simpleName, "Refresh list.")
+    }
 
-    override fun addUser(user: User) {
-        // TODO: ew. use flow.
-        CoroutineScope(defaultDispatcher).launch {
+    override suspend fun addUser(user: User) {
+        withContext(defaultDispatcher) {
             databaseClient.save(userId = userId, user)
+        }
+    }
+
+    override suspend fun removeUser(itemId: String) {
+        withContext(defaultDispatcher) {
+            databaseClient.delete(userId = userId, itemId)
         }
     }
 }

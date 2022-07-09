@@ -142,7 +142,7 @@ class RoomDatabaseClientImplTest {
         val items = arrayOf(*cars, *users)
         underTest.save(userId, items = items)
 
-        val actual = underTest.get(userId, MockCar::class)
+        val actual = underTest.getAll(userId, MockCar::class)
         val expected = cars.toList()
         assertEquals(expected, actual)
     }
@@ -230,7 +230,7 @@ class RoomDatabaseClientImplTest {
     @Test
     fun returnEmptyList_ifNoItemsFound() = runTest {
         val expected = emptyList<MockCar>()
-        val actual = underTest.get(userId, MockCar::class)
+        val actual = underTest.getAll(userId, MockCar::class)
         assertEquals(expected, actual)
     }
 

@@ -12,6 +12,7 @@ import dev.libatorium.nosqlroom.util.DateTimeUtils
 import dev.libatorium.nosqlroom.util.GsonUtcDateSerializer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.reflect.KClass
@@ -50,25 +51,24 @@ internal class RoomDatabaseClientImpl(
             )
         }
 
-    override suspend fun <T : DbModel> get(userId: String, typeOf: KClass<T>): List<T> =
-        withContext(defaultDispatcher) {
-            val type = typeOf.qualifiedName ?: throw IllegalArgumentException("Invalid type!")
-            database.noSqlEntityDao()
-                .getAllEntitiesOfType(userId = userId, typeOf = type)
+    override fun <T : DbModel> getAll(userId: String, typeOf: KClass<T>): Flow<List<T>> {
+        val type = typeOf.qualifiedName ?: throw IllegalArgumentException("Invalid type!")
+        return database.noSqlEntityDao().getAllEntitiesOfType(userId = userId, typeOf = type)
+            .flowOn(defaultDispatcher)
+            .map { list -> list
                 ?.map { eAF -> eAF.toNoSqlEntity() }
                 ?.map { e -> _gson.fromJson(e.data, typeOf.java) }
-                ?.toList()
                 ?: emptyList()
-        }
+            }
+    }
 
-    override suspend fun <T : DbModel> get(userId: String, itemId: String, typeOf: KClass<T>): T? =
-        withContext(defaultDispatcher) {
-            val type = typeOf.qualifiedName ?: throw IllegalArgumentException("Invalid type!")
-            database.noSqlEntityDao()
-                .getEntity(userId = userId, typeOf = type, id = itemId)
-                ?.toNoSqlEntity()
-                ?.let { e -> _gson.fromJson(e.data, typeOf.java) }
-        }
+    override fun <T : DbModel> get(userId: String, itemId: String, typeOf: KClass<T>): Flow<T?> {
+        val type = typeOf.qualifiedName ?: throw IllegalArgumentException("Invalid type!")
+        return database.noSqlEntityDao().getEntity(userId = userId, typeOf = type, id = itemId)
+            .flowOn(defaultDispatcher)
+            .mapNotNull { it?.toNoSqlEntity() }
+            .map { e -> _gson.fromJson(e.data, typeOf.java) }
+    }
 
     override suspend fun save(userId: String, vararg items: DbModel) =
         withContext(defaultDispatcher) {
@@ -76,12 +76,12 @@ internal class RoomDatabaseClientImpl(
             database.noSqlEntityDao().saveEntities(*entities)
         }
 
-    override suspend fun delete(userId: String, vararg itemIds: String): Int =
+    override suspend fun delete(userId: String, vararg itemIds: String) =
         withContext(defaultDispatcher) {
             database.noSqlEntityDao().deleteEntities(userId = userId, ids = itemIds)
         }
 
-    override suspend fun <T : DbModel> delete(userId: String, vararg items: T): Int =
+    override suspend fun <T : DbModel> delete(userId: String, vararg items: T) =
         withContext(defaultDispatcher) {
             val entities =
                 items.map { it.toNoSqlEntity(gson = _gson, userId = userId) }.toTypedArray()

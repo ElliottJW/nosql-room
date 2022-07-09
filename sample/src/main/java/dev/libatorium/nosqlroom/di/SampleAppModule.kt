@@ -12,6 +12,7 @@ import dev.libatorium.nosqlroom.data.provider.UserIdProviderImpl
 import dev.libatorium.nosqlroom.data.repository.UserRepositoryImpl
 import dev.libatorium.nosqlroom.domain.provider.UserIdProvider
 import dev.libatorium.nosqlroom.domain.repository.UserRepository
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -30,6 +31,7 @@ object SampleAppModule {
     }
 
     @Provides
+    @Singleton
     fun provideDatabaseClient(
         @ApplicationContext context: Context
     ) : DatabaseClient {

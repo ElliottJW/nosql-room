@@ -7,6 +7,7 @@ import dev.libatorium.nosqlroom.domain.model.User
 import dev.libatorium.nosqlroom.domain.repository.UserRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
@@ -21,7 +22,15 @@ class SampleAppViewModel @Inject constructor(
         replay = 1)
 
     fun onAddUser() {
-        val randomUserId = UUID.randomUUID().toString()
-        userRepository.addUser(User(id = randomUserId))
+        viewModelScope.launch {
+            val randomUserId = UUID.randomUUID().toString()
+            userRepository.addUser(User(id = randomUserId))
+        }
+    }
+
+    fun onDeleteUser(user: User) {
+        viewModelScope.launch {
+            userRepository.removeUser(user.id)
+        }
     }
 }

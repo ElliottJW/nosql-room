@@ -1,12 +1,13 @@
 package dev.libatorium.nosqlroom.ui.app
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -18,6 +19,7 @@ import dev.libatorium.lib.nosqlroom.R
 import dev.libatorium.nosqlroom.domain.model.User
 import dev.libatorium.nosqlroom.ui.theme.NoSqlRoomSampleTheme
 
+@OptIn(ExperimentalFoundationApi::class)
 @ExperimentalMaterialApi
 @Composable
 fun SampleApp(
@@ -35,10 +37,13 @@ fun SampleApp(
             val users by sampleAppViewModel.users.collectAsState(emptyList())
             LazyColumn(modifier = Modifier.padding(paddingValues = paddingValues)) {
                 items(users) { u ->
-                    UserDisplay(user = u) { user ->
-                        val display = context.getString(R.string.this_is_user_id, user.id)
-                        Toast.makeText(context, display, Toast.LENGTH_SHORT).show()
-                    }
+                    UserDisplay(
+                        user = u,
+                        onDeleteClicked = { user -> sampleAppViewModel.onDeleteUser(user) },
+                        onUserClicked = { user ->
+                            val display = context.getString(R.string.this_is_user_id, user.id)
+                            Toast.makeText(context, display, Toast.LENGTH_SHORT).show()
+                        })
                 }
             }
         }
@@ -49,13 +54,26 @@ fun SampleApp(
 @Composable
 fun UserDisplay(
     user: User,
-    onUserClicked: (User) -> Unit
+    onUserClicked: (User) -> Unit,
+    onDeleteClicked: (User) -> Unit
 ) {
-    Card(onClick = { onUserClicked(user) }, modifier = Modifier.padding(16.dp)) {
-        Text(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            text = stringResource(id = R.string.user_id, formatArgs = arrayOf(user.id))
-        )
+    Card(onClick = { onUserClicked(user) }) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(id = R.string.user_id, formatArgs = arrayOf(user.id)),
+                modifier = Modifier.weight(3f)
+            )
+            Spacer(modifier = Modifier.padding(8.dp))
+            Button(onClick = { onDeleteClicked(user) }, modifier = Modifier.weight(1f)) {
+                Text(text = stringResource(id = R.string.delete))
+            }
+        }
     }
 }
 
@@ -63,7 +81,10 @@ fun UserDisplay(
 @Preview
 @Composable
 fun UserDisplayPreview() {
-    UserDisplay(user = User(id = "Hello World"), onUserClicked = {})
+    UserDisplay(
+        user = User(id = "Hello World Hello World Hello World Hello World"),
+        onDeleteClicked = {},
+        onUserClicked = {})
 }
 
 @Composable
